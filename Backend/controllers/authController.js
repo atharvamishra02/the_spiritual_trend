@@ -24,20 +24,36 @@ const generateToken = (res, userId) => {
 };
 
 // Helper functions
-const generateAccessToken = (admin) => {
+const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: admin._id, isAdmin: true },
+    { id: user._id },
     process.env.JWT_SECRET,
     { expiresIn: '15m' }
   );
 };
 
-const generateRefreshToken = (admin) => {
+const generateRefreshToken = (user) => {
   return jwt.sign(
-    { id: admin._id, isAdmin: true },
+    { id: user._id },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '30d' }
   );
+};
+
+const setRefreshTokenCookie = (res, token) => {
+  console.log('🍪 Setting refresh token cookie...');
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: false, // set to true in production with https
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
+  console.log('🍪 Refresh token cookie set with options:', {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: '30 days'
+  });
 };
 
 // Refresh token endpoint
@@ -105,24 +121,29 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  console.log('🔐 Login attempt for:', req.body.email);
+  
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user || !(await user.matchPassword(password))) {
+    console.log('❌ Login failed: Invalid credentials');
     return res.status(401).json({ msg: "Invalid credentials" });
   }
   
-  const token = generateToken(res, user._id);
-  // Emit notification to admin panel
-  if (global.io) {
-    global.io.emit('notification', {
-      type: 'user_login',
-      message: `User ${user.email} logged in`,
-      timestamp: new Date().toISOString()
-    });
-  }
+  console.log('✅ Login successful for user:', user._id);
+  
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  
+  console.log('🔑 Access token generated:', accessToken.substring(0, 20) + '...');
+  console.log('🔄 Refresh token generated:', refreshToken.substring(0, 20) + '...');
+  
+  setRefreshTokenCookie(res, refreshToken);
+  console.log('🍪 Refresh token cookie set');
+  
   res.status(200).json({
     msg: "Login successful",
-    token,
+    token: accessToken,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -132,6 +153,36 @@ export const login = async (req, res) => {
       address: user.address,
     },
   });
+};
+
+export const refreshToken = (req, res) => {
+  console.log('🔄 Refresh token endpoint called');
+  console.log('Cookies:', req.cookies);
+  
+  const token = req.cookies.refreshToken;
+  if (!token) {
+    console.log('❌ No refresh token found in cookies');
+    return res.status(401).json({ msg: "No refresh token" });
+  }
+  
+  console.log('✅ Refresh token found:', token.substring(0, 20) + '...');
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    console.log('✅ Refresh token verified for user:', decoded.id);
+    
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    
+    console.log('✅ New access token generated');
+    res.json({ token: accessToken });
+  } catch (err) {
+    console.log('❌ Refresh token verification failed:', err.message);
+    res.status(401).json({ msg: "Invalid or expired refresh token" });
+  }
 };
 
 export const logout = (req, res) => {

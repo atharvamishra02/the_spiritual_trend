@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   mobile: { type: String, required: true },
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
+  profileImage: { type: String, default: '' },
   address: {
     address1: { type: String, default: '' },
     address2: { type: String, default: '' },
