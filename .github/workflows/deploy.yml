@@ -23,6 +23,15 @@ jobs:
           echo "🚀 STARTING THE SPIRITUAL TREND AUTO-DEPLOY PIPELINE ON VPS SERVER"
           echo "========================================================================="
           
+          # Run diagnostic checks to pinpoint server disk space or directory issues
+          echo "=== 📊 VPS DIAGNOSTICS ==="
+          df -h || true
+          ls -la /var/www || true
+          echo "=========================="
+          
+          # Enable shell tracing to print each command as it runs
+          set -x
+          
           # 1. DEFINE PATH OR RETRIEVE IN TARGET DIRECTORY
           # Standard directory: /var/www/the_spiritual_trend
           TARGET_DIR="/var/www/the_spiritual_trend"
@@ -31,16 +40,19 @@ jobs:
           export GIT_TERMINAL_PROMPT=0
           
           if [ ! -d "$TARGET_DIR/.git" ]; then
-            echo "⚠️  Git repository not found at $TARGET_DIR. Initializing clone..."
-            rm -rf "$TARGET_DIR"
+            echo "⚠️  Git repository not found at $TARGET_DIR. Initializing repository..."
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
-            echo "🔄 Cloning the private repository using temporary GITHUB_TOKEN..."
-            git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git .
+            git init
+            set +x # Temporarily turn off tracing to protect the sensitive GITHUB_TOKEN
+            git remote add origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+            set -x
           else
             cd "$TARGET_DIR"
             echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
+            set +x # Temporarily turn off tracing to protect the sensitive GITHUB_TOKEN
             git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+            set -x
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
