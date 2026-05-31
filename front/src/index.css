@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Crimson+Text:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Crimson Text", "EB Garamond", serif;
+  --font-tangerine: "Tangerine", cursive;
+}
+
+body {
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Style main headers with the gorgeous calligraphic spiritual font */
+h1, h2, .spiritual-header, .font-tangerine {
+  font-family: var(--font-tangerine);
+}
+
+/* Ensure cursive text displays clearly at reasonable sizes */
+h1 {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+h2 {
+  font-size: 2.75rem;
+  line-height: 1.1;
+}
+
+/* Premium Cashfree Payments Simulator Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@keyframes scanner-sweep {
+  0% { top: 0%; opacity: 0.2; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0%; opacity: 0.2; }
+}
+.animate-scanner-sweep {
+  animation: scanner-sweep 3s infinite ease-in-out;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 12s infinite linear;
+}
