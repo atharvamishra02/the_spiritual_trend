@@ -30,16 +30,17 @@ jobs:
           # Disable interactive git prompt so it fails fast rather than hanging
           export GIT_TERMINAL_PROMPT=0
           
-          if [ ! -d "$TARGET_DIR" ]; then
-            echo "⚠️  Directory $TARGET_DIR does not exist. Creating it now..."
+          if [ ! -d "$TARGET_DIR/.git" ]; then
+            echo "⚠️  Git repository not found at $TARGET_DIR. Initializing clone..."
+            rm -rf "$TARGET_DIR"
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
             echo "🔄 Cloning the private repository using temporary GITHUB_TOKEN..."
-            git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
+            git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git .
           else
             cd "$TARGET_DIR"
             echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
-            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
@@ -48,7 +49,7 @@ jobs:
           git reset --hard origin/main
           
           # 3. VERIFY DOCKER & DOCKER COMPOSE CONFIGURATION
-          if ! command -v docker &> /dev/null; then
+          if ! command -v docker > /dev/null 2>&1; then
             echo "❌ ERROR: Docker is not installed on this VPS! Install it first."
             exit 1
           fi
@@ -57,7 +58,7 @@ jobs:
           echo "🏗️  Rebuilding and launching updated containers in detached daemon mode..."
           
           # Support both 'docker-compose' and 'docker compose' syntax
-          if command -v docker-compose &> /dev/null; then
+          if command -v docker-compose > /dev/null 2>&1; then
             docker-compose down
             docker-compose up --build -d
           else
