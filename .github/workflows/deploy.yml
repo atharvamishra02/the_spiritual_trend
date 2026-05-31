@@ -49,8 +49,9 @@ jobs:
           git reset --hard origin/main
           
           # 3. VERIFY DOCKER & DOCKER COMPOSE CONFIGURATION
-          if ! command -v docker > /dev/null 2>&1; then
-            echo "❌ ERROR: Docker is not installed on this VPS! Install it first."
+          DOCKER_PATH=$(which docker 2>/dev/null || true)
+          if [ -z "$DOCKER_PATH" ]; then
+            echo "❌ ERROR: Docker is not installed on this VPS. Install it first."
             exit 1
           fi
           
@@ -58,7 +59,8 @@ jobs:
           echo "🏗️  Rebuilding and launching updated containers in detached daemon mode..."
           
           # Support both 'docker-compose' and 'docker compose' syntax
-          if command -v docker-compose > /dev/null 2>&1; then
+          DOCKER_COMPOSE_PATH=$(which docker-compose 2>/dev/null || true)
+          if [ -n "$DOCKER_COMPOSE_PATH" ]; then
             docker-compose down
             docker-compose up --build -d
           else
@@ -71,5 +73,5 @@ jobs:
           docker image prune -f
           
           echo "========================================================================="
-          echo "🎉 THE SPIRITUAL TREND DEPLOYED SUCCESSFUL!"
+          echo "🎉 THE SPIRITUAL TREND DEPLOYED SUCCESSFULLY."
           echo "========================================================================="
