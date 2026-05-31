@@ -17,8 +17,9 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT || 2222 }}
-        script_stop: true
+        script_stop: false
         script: |
+          set -e
           echo "========================================================================="
           echo "🚀 STARTING THE SPIRITUAL TREND AUTO-DEPLOY PIPELINE ON VPS SERVER"
           echo "========================================================================="
@@ -28,9 +29,6 @@ jobs:
           df -h || true
           ls -la /var/www || true
           echo "=========================="
-          
-          # Enable shell tracing to print each command as it runs
-          set -x
           
           # 1. DEFINE PATH OR RETRIEVE IN TARGET DIRECTORY
           # Standard directory: /var/www/the_spiritual_trend
@@ -44,15 +42,11 @@ jobs:
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
             git init
-            set +x # Temporarily turn off tracing to protect the sensitive GITHUB_TOKEN
             git remote add origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
-            set -x
           else
             cd "$TARGET_DIR"
             echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
-            set +x # Temporarily turn off tracing to protect the sensitive GITHUB_TOKEN
             git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
-            set -x
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
