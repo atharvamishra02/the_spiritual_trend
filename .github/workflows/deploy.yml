@@ -26,14 +26,19 @@ jobs:
           # Standard directory: /var/www/the_spiritual_trend
           TARGET_DIR="/var/www/the_spiritual_trend"
           
+          # Disable interactive git prompt so it fails fast rather than hanging
+          export GIT_TERMINAL_PROMPT=0
+          
           if [ ! -d "$TARGET_DIR" ]; then
             echo "⚠️  Directory $TARGET_DIR does not exist. Creating it now..."
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
-            echo "🔄 Cloning the repository for the first time..."
-            git clone https://github.com/${{ github.repository }}.git .
+            echo "🔄 Cloning the private repository using temporary GITHUB_TOKEN..."
+            git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
           else
             cd "$TARGET_DIR"
+            echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
