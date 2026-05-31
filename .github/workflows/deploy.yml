@@ -1,5 +1,6 @@
 name: VPS Production Docker CI/CD Deploy Pipeline
 
+# Trigger fresh run to pick up newly updated secrets
 on:
   push:
     branches: [ main ]
