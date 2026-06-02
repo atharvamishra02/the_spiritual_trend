@@ -75,8 +75,10 @@ jobs:
           fi
           
           # 5. POST-DEPLOYMENT CLEANUP (Pruning unused dangling build cache & old layers)
-          echo "🧼 Cleaning up dangling image layers to free up server disk space..."
+          echo "🧼 Cleaning up dangling image layers and build cache to free up server disk space..."
           docker image prune -f
+          docker builder prune -af
+
           
           echo "========================================================================="
           echo "🎉 THE SPIRITUAL TREND DEPLOYED SUCCESSFULLY."
