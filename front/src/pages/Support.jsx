@@ -71,10 +71,10 @@ const Support = () => {
               <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-3 sm:mb-4">Email Support</h3>
               <p className="text-sm sm:text-base text-gray-300 mb-4">Get detailed assistance via email</p>
               <a 
-                href="mailto:support@thespiritualtrend.com" 
+                href="mailto:support@thespiritualtrends.com" 
                 className="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base break-all"
               >
-                support@thespiritualtrend.com
+                support@thespiritualtrends.com
               </a>
             </div>
           </motion.div>

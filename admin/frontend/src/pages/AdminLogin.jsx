@@ -56,7 +56,7 @@ const AdminLogin = () => {
                   type="email"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="admin@spiritualtrend.com"
+                  placeholder="admin@thespiritualtrends.com"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
                 />
@@ -109,7 +109,7 @@ const AdminLogin = () => {
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
             <div className="text-xs text-gray-500 space-y-1">
-              <p><strong>Email:</strong> admin@spiritualtrend.com</p>
+              <p><strong>Email:</strong> admin@thespiritualtrends.com</p>
               <p><strong>Password:</strong> admin123</p>
             </div>
           </div>

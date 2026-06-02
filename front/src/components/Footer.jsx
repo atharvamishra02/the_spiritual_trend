@@ -118,7 +118,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <FaEnvelope className="text-yellow-500 text-sm" />
-                <span className="text-yellow-300 text-sm">info@spiritualtrend.com</span>
+                <span className="text-yellow-300 text-sm">info@thespiritualtrends.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <FaWhatsapp className="text-yellow-500 text-sm" />
