@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, Bell, Search, User } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { BACKEND_URL } from '../utils/config.js';
 
 const Navbar = ({ onSidebarToggle }) => {
   const [notifications, setNotifications] = useState([]);
@@ -10,7 +11,7 @@ const Navbar = ({ onSidebarToggle }) => {
 
   useEffect(() => {
     // Connect to backend Socket.IO server
-    socketRef.current = io('http://localhost:5000', {
+    socketRef.current = io(BACKEND_URL, {
       transports: ['websocket'],
       withCredentials: true
     });

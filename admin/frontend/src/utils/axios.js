@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { adminLogout } from './auth.js';
+import { API_BASE_URL } from './config.js';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api/admin',
+  baseURL: API_BASE_URL,
   timeout: 10000, // 10 second timeout
   headers: {
     'Content-Type': 'application/json'

@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:5000/api/admin';
+import { API_BASE_URL } from './config.js';
 
 // Admin login
 export const adminLogin = async (email, password) => {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
+import { BACKEND_URL, API_BASE_URL } from '../utils/config.js';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -16,7 +17,7 @@ const Cart = () => {
             Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
           },
         };
-        const { data } = await axios.get('http://localhost:5000/api/admin/cart', config);
+        const { data } = await axios.get(`${API_BASE_URL}/cart`, config);
         console.log('Cart data:', data); // Debug: check if data is an array
         setCartItems(Array.isArray(data) ? data : []);
         setLoading(false);
@@ -30,7 +31,7 @@ const Cart = () => {
     fetchCartItems();
 
     // --- Real-time updates with Socket.IO ---
-    const socket = io('http://localhost:5000', {
+    const socket = io(BACKEND_URL, {
       transports: ['websocket'],
       withCredentials: true
     });
