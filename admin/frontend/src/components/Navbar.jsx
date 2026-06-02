@@ -77,7 +77,7 @@ const Navbar = ({ onSidebarToggle }) => {
           <div className="flex items-center space-x-3">
             <div className="hidden md:block text-right">
               <p style={{ color: '#FFD700', fontWeight: 'bold' }} className="text-sm">Admin User</p>
-              <p style={{ color: '#FFD700', opacity: 0.8 }} className="text-xs">admin@thespiritualtrends.com</p>
+              <p style={{ color: '#FFD700', opacity: 0.8 }} className="text-xs">admin@thespritualtrends.com</p>
             </div>
             <div style={{ backgroundColor: '#FFD700' }} className="w-8 h-8 rounded-full flex items-center justify-center">
               <User size={16} style={{ color: '#000' }} />

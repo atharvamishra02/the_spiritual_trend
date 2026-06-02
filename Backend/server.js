@@ -41,12 +41,12 @@ const allowedOrigins = [
   'http://127.0.0.1:5173',
   'http://localhost:5174',
   'http://127.0.0.1:5174',
-  'http://thespiritualtrends.com',
-  'https://thespiritualtrends.com',
-  'http://www.thespiritualtrends.com',
-  'https://www.thespiritualtrends.com',
-  'http://admin.thespiritualtrends.com',
-  'https://admin.thespiritualtrends.com'
+  'http://thespritualtrends.com',
+  'https://thespritualtrends.com',
+  'http://www.thespritualtrends.com',
+  'https://www.thespritualtrends.com',
+  'http://admin.thespritualtrends.com',
+  'https://admin.thespritualtrends.com'
 ];
 
 // Middleware
