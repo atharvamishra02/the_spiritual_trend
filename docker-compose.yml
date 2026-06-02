@@ -10,7 +10,7 @@ services:
     env_file:
       - ./Backend/.env
     environment:
-      - MONGO_URI=mongodb://host.docker.internal:27017/spiritual-trend
+      - MONGO_URI=mongodb://spiritual_trend_mongodb:27017/spiritual-trend
     ports:
       - "127.0.0.1:5080:5000"
     extra_hosts:
