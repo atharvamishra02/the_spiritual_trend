@@ -36,14 +36,22 @@ if (!process.env.JWT_SECRET) {
   console.error('Example: JWT_SECRET=your-super-secret-jwt-key-here');
 }
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+  'http://thespiritualtrends.com',
+  'https://thespiritualtrends.com',
+  'http://www.thespiritualtrends.com',
+  'https://www.thespiritualtrends.com',
+  'http://admin.thespiritualtrends.com',
+  'https://admin.thespiritualtrends.com'
+];
+
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:5174',
-    'http://127.0.0.1:5174'
-  ],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -107,12 +115,7 @@ const connectDB = async () => {
     // --- SOCKET.IO SETUP ---
     const io = new Server(server, {
       cors: {
-        origin: [
-          'http://localhost:5173',
-          'http://127.0.0.1:5173',
-          'http://localhost:5174',
-          'http://127.0.0.1:5174'
-        ],
+        origin: allowedOrigins,
         credentials: true
       }
     });

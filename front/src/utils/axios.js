@@ -1,7 +1,22 @@
 import axios from "axios";
 
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return "http://localhost:5000";
+    }
+    // In production, backend is served on the same origin (proxied by Nginx under /api and /uploads)
+    return window.location.origin;
+  }
+  return "http://localhost:5000";
+};
+
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000",
+  baseURL: getBackendUrl(),
   withCredentials: true, // allow cookies for refresh token
 });
 
