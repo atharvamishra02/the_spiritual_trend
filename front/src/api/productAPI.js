@@ -1,7 +1,18 @@
 import axios from '../utils/axios.js';
 
-const API_BASE_URL = 'http://localhost:5000/api/products';
-const CATEGORY_URL = 'http://localhost:5000/api/homepage/categories';
+const API_BASE_URL = '/api/products';
+const CATEGORY_URL = '/api/homepage/categories';
+
+// Get banner URL
+export const getBannerUrl = async () => {
+  try {
+    const response = await axios.get('/api/homepage/banner');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching banner:', error);
+    throw error;
+  }
+};
 
 // Get all active products
 export const getProducts = async () => {

@@ -456,7 +456,7 @@ const ${product.pageName.replace(/\s+/g, '')} = () => {
 export default ${product.pageName.replace(/\s+/g, '')};
 `;
 
-    const frontendPagesDir = path.join(process.cwd(), '../frontend/src/pages');
+    const frontendPagesDir = path.join(process.cwd(), '../front/src/pages');
     const pagePath = path.join(frontendPagesDir, `${product.pageName.replace(/\s+/g, '')}.jsx`);
     
     fs.writeFileSync(pagePath, pageTemplate);
@@ -470,7 +470,7 @@ export default ${product.pageName.replace(/\s+/g, '')};
 // Delete product page
 const deleteProductPage = async (pageSlug) => {
   try {
-    const frontendPagesDir = path.join(process.cwd(), '../frontend/src/pages');
+    const frontendPagesDir = path.join(process.cwd(), '../front/src/pages');
     const pagePath = path.join(frontendPagesDir, `${pageSlug}.jsx`);
     
     if (fs.existsSync(pagePath)) {

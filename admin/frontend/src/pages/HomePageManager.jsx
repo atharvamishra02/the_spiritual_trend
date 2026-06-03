@@ -67,7 +67,7 @@ const HomePageManager = () => {
 
   const fetchBannerUrl = async () => {
     try {
-      const res = await fetch('/api/admin/homepage/banner', {
+      const res = await fetch('http://localhost:5000/api/admin/homepage/banner', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
@@ -83,7 +83,7 @@ const HomePageManager = () => {
 
   const fetchHomePageData = async () => {
     try {
-      const res = await fetch('/api/admin/homepage', {
+      const res = await fetch('http://localhost:5000/api/admin/homepage', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
@@ -113,7 +113,7 @@ const HomePageManager = () => {
     const formData = new FormData();
     formData.append('banner', bannerFile);
     try {
-      const res = await axios.post('/api/admin/homepage/upload-banner', formData, {
+      const res = await axios.post('http://localhost:5000/api/admin/homepage/upload-banner', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`

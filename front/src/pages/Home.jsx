@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFeaturedProducts, getFamousProducts, getCategories } from '../api/productAPI';
+import { getFeaturedProducts, getFamousProducts, getCategories, getBannerUrl } from '../api/productAPI';
 import { useCurrency } from "../context/CurrencyContext";
 import HeartIcon from '../components/HeartIcon';
 
@@ -30,6 +30,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [catLoading, setCatLoading] = useState(true);
+  const [bannerUrl, setBannerUrl] = useState("");
   
   // Currency symbols mapping
   const currencySymbols = { USD: '$', INR: '₹', AED: 'د.إ' };
@@ -66,22 +67,51 @@ const Home = () => {
     }).catch(() => setCatLoading(false));
   }, []);
 
+  useEffect(() => {
+    getBannerUrl().then((data) => {
+      if (data && data.bannerUrl) {
+        setBannerUrl(data.bannerUrl);
+      }
+    }).catch((err) => console.error("Error loading banner:", err));
+  }, []);
+
   return (
     <>
       <style>{floatingStyles}</style>
       <div className="w-full min-h-screen bg-black text-yellow-500 flex flex-col items-center justify-start">
       {/* Hero section: video as background with overlayed content */}
       <div className="w-full relative flex items-center justify-center" style={{ height: '90vh', minHeight: '90vh', maxHeight: '100vh', overflow: 'hidden', marginTop: 0, paddingTop: 0 }}>
-        <video
-          className="absolute top-0 left-0 w-full h-full object-cover z-0"
-          src="/bg3.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          controls={false}
-        />
+        {bannerUrl ? (
+          bannerUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+            <video
+              className="absolute top-0 left-0 w-full h-full object-cover z-0"
+              src={bannerUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              controls={false}
+            />
+          ) : (
+            <img
+              className="absolute top-0 left-0 w-full h-full object-cover z-0"
+              src={bannerUrl}
+              alt="Homepage Banner"
+            />
+          )
+        ) : (
+          <video
+            className="absolute top-0 left-0 w-full h-full object-cover z-0"
+            src="/bg3.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            controls={false}
+          />
+        )}
         {/* Overlay for readability and content */}
         <div className="absolute inset-0 bg-opacity-40 z-10 flex flex-col items-center justify-center w-full h-full">
           <h1 className="text-5xl font-extrabold mb-4 text-center text-yellow-400 drop-shadow-lg">The Spiritual Trend</h1>

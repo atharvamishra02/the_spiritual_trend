@@ -82,17 +82,21 @@ import adminProductRoutes from './routes/adminProductRoutes.js';
 import adminOrderRoutes from './routes/adminOrderRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
 import adminCartRoutes from './routes/adminCartRoutes.js';
+import adminHomepageRoutes from './routes/adminHomepageRoutes.js';
 
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/admin/orders', adminOrderRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/cart', adminCartRoutes);
+app.use('/api/admin/homepage', adminHomepageRoutes);
 
 // Product Routes
+import homepageRoutes from './routes/homepageRoutes.js';
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/homepage/categories', categoryRoutes);
+app.use('/api/homepage', homepageRoutes);
 
 // ❌ Unknown Route Handler (this should always be last)
 app.use((req, res) => {
