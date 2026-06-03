@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import categoryRoutes from './routes/categoryRoutes.js';
 import { Server } from 'socket.io';
 import paymentRoutes from './routes/paymentRoutes.js';
+import { seedAdmin } from './utils/seedAdmin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,6 +107,9 @@ const connectDB = async () => {
     
     await mongoose.connect(mongoURI);
     console.log('✅ MongoDB connected successfully');
+    
+    // Seed default admin user
+    await seedAdmin();
     
     // Start server only after DB connection
     const server = app.listen(PORT, () => {
