@@ -43,6 +43,8 @@ export const createOrder = async (req, res) => {
     // Cashfree customer phone validation (must be 10 digits for India)
     const formattedPhone = customerPhone.replace(/\D/g, '').slice(-10);
 
+    const origin = req.headers.origin || 'https://thespritualtrends.com';
+
     const response = await fetch(cashfreeUrl, {
       method: 'POST',
       headers: {
@@ -62,7 +64,7 @@ export const createOrder = async (req, res) => {
           customer_phone: formattedPhone || '9999999999'
         },
         order_meta: {
-          return_url: `http://localhost:5173/payment-status?order_id={order_id}`
+          return_url: `${origin}/payment-status?order_id={order_id}`
         }
       })
     });
