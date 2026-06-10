@@ -5,6 +5,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -36,18 +39,22 @@ jobs:
           
           # Disable interactive git prompt so it fails fast rather than hanging
           export GIT_TERMINAL_PROMPT=0
-          export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+          
+          # Configure Git to force IPv4 and timeout quickly on hung connections (e.g. IPv6 issues)
+          git config --global http.ipv4 true || true
+          git config --global http.lowSpeedLimit 1000 || true
+          git config --global http.lowSpeedTime 30 || true
           
           if [ ! -d "$TARGET_DIR/.git" ]; then
             echo "⚠️  Git repository not found at $TARGET_DIR. Initializing repository..."
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
             git init
-            git remote add origin git@github.com:${{ github.repository }}.git
+            git remote add origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
           else
             cd "$TARGET_DIR"
-            echo "🔄 Updating Git remote URL to use SSH..."
-            git remote set-url origin git@github.com:${{ github.repository }}.git
+            echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
+            git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
