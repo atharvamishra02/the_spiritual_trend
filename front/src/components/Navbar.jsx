@@ -13,7 +13,7 @@ const Navbar = () => {
   const isHomePage = location.pathname === "/";
   const isLightPage = !isHomePage && (
     location.pathname.includes("/category/") || 
-    location.pathname.includes("/support")
+    (location.pathname.includes("/support") && location.pathname !== "/support")
   );
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

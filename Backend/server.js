@@ -50,9 +50,39 @@ const allowedOrigins = [
   'https://admin.thespritualtrends.com'
 ];
 
+// Load additional allowed origins from environment variable
+if (process.env.ALLOWED_ORIGINS) {
+  const envOrigins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean);
+  allowedOrigins.push(...envOrigins);
+}
+
+// Helper function to check if origin is allowed (including any localhost/127.0.0.1 port)
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Allow non-browser requests (like mobile apps, curl, postman)
+  
+  // Check loopback / localhost on any port
+  const isLocal = origin.startsWith('http://localhost:') || 
+                  origin.startsWith('https://localhost:') || 
+                  origin.startsWith('http://127.0.0.1:') || 
+                  origin.startsWith('https://127.0.0.1:') ||
+                  origin === 'http://localhost' ||
+                  origin === 'http://127.0.0.1';
+                  
+  if (isLocal) return true;
+  
+  return allowedOrigins.includes(origin);
+};
+
 // Middleware
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ [CORS Blocked] Origin "${origin}" is not allowed.`);
+      callback(new Error(`Not allowed by CORS: ${origin}`), false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -123,7 +153,14 @@ const connectDB = async () => {
     // --- SOCKET.IO SETUP ---
     const io = new Server(server, {
       cors: {
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+          if (isOriginAllowed(origin)) {
+            callback(null, true);
+          } else {
+            console.warn(`⚠️ [Socket.io CORS Blocked] Origin "${origin}" is not allowed.`);
+            callback(new Error(`Not allowed by CORS: ${origin}`), false);
+          }
+        },
         credentials: true
       }
     });

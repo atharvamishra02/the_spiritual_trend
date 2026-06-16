@@ -14,7 +14,7 @@ import axios from 'axios';
 const IS_DEV = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-const BACKEND_URL = IS_DEV ? 'http://localhost:5000' : window.location.origin;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (IS_DEV ? 'http://localhost:5000' : window.location.origin);
 
 // Global Axios request interceptor to dynamically rewrite hardcoded localhost:5000 URLs in production
 axios.interceptors.request.use((config) => {
