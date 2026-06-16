@@ -21,6 +21,7 @@ services:
         max-file: "3"
 
   backend:
+    image: ghcr.io/atharvamishra02/the_spiritual_trend/backend:latest
     build:
       context: ./Backend
       dockerfile: Dockerfile
@@ -50,6 +51,7 @@ services:
         max-file: "3"
 
   frontend:
+    image: ghcr.io/atharvamishra02/the_spiritual_trend/frontend:latest
     build:
       context: ./front
       dockerfile: Dockerfile
@@ -71,6 +73,7 @@ services:
         max-file: "3"
 
   admin_frontend:
+    image: ghcr.io/atharvamishra02/the_spiritual_trend/admin-frontend:latest
     build:
       context: ./admin/frontend
       dockerfile: Dockerfile

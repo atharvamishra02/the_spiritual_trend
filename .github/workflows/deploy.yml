@@ -1,18 +1,58 @@
 name: VPS Production Docker CI/CD Deploy Pipeline
 
-# Trigger fresh run to pick up newly updated secrets
 on:
   push:
     branches: [ main ]
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Backend Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Backend
+        push: true
+        tags: ghcr.io/atharvamishra02/the_spiritual_trend/backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push Frontend Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./front
+        push: true
+        tags: ghcr.io/atharvamishra02/the_spiritual_trend/frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push Admin Frontend Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./admin/frontend
+        push: true
+        tags: ghcr.io/atharvamishra02/the_spiritual_trend/admin-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
     - name: Deploy to VPS Server via SSH Execution
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -27,20 +67,18 @@ jobs:
           echo "🚀 STARTING THE SPIRITUAL TREND AUTO-DEPLOY PIPELINE ON VPS SERVER"
           echo "========================================================================="
           
-          # Run diagnostic checks to pinpoint server disk space or directory issues
+          # Run diagnostic checks
           echo "=== 📊 VPS DIAGNOSTICS ==="
           df -h || true
-          ls -la /var/www || true
           echo "=========================="
           
           # 1. DEFINE PATH OR RETRIEVE IN TARGET DIRECTORY
-          # Standard directory: /var/www/the_spiritual_trend
           TARGET_DIR="/var/www/the_spiritual_trend"
           
-          # Disable interactive git prompt so it fails fast rather than hanging
+          # Disable interactive git prompt so it fails fast
           export GIT_TERMINAL_PROMPT=0
           
-          # Configure Git to force IPv4 and timeout quickly on hung connections (e.g. IPv6 issues)
+          # Configure Git to force IPv4 and timeout quickly on hung connections
           git config --global http.ipv4 true || true
           git config --global http.lowSpeedLimit 1000 || true
           git config --global http.lowSpeedTime 30 || true
@@ -62,31 +100,20 @@ jobs:
           git fetch --all
           git reset --hard origin/main
           
-          # 3. VERIFY DOCKER & DOCKER COMPOSE CONFIGURATION
-          DOCKER_PATH=$(which docker 2>/dev/null || true)
-          if [ -z "$DOCKER_PATH" ]; then
-            echo "❌ ERROR: Docker is not installed on this VPS. Install it first."
-            exit 1
-          fi
+          # 3. LOG IN TO GHCR AND DEPLOY
+          echo "🔑 Logging in to GHCR on VPS..."
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
-          # 4. DEPLOY PRODUCTION CONTAINERS VIA COMPOSE
+          echo "📥 Pulling latest pre-built images from GHCR..."
+          docker compose pull
+          
           echo "🏗️  Rebuilding and launching updated containers in detached daemon mode..."
+          docker compose down
+          docker compose up -d
           
-          # Support both 'docker-compose' and 'docker compose' syntax
-          DOCKER_COMPOSE_PATH=$(which docker-compose 2>/dev/null || true)
-          if [ -n "$DOCKER_COMPOSE_PATH" ]; then
-            docker-compose down
-            docker-compose up --build -d
-          else
-            docker compose down
-            docker compose up --build -d
-          fi
-          
-          # 5. POST-DEPLOYMENT CLEANUP (Pruning unused dangling build cache & old layers)
-          echo "🧼 Cleaning up dangling image layers and build cache to free up server disk space..."
-          docker image prune -f
-          docker builder prune -af
-
+          # 4. POST-DEPLOYMENT CLEANUP (Pruning unused dangling build cache & old layers)
+          echo "🧼 Cleaning up old unused Docker images..."
+          docker image prune -af
           
           echo "========================================================================="
           echo "🎉 THE SPIRITUAL TREND DEPLOYED SUCCESSFULLY."
