@@ -50,11 +50,11 @@ jobs:
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
             git init
-            git remote add origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+            git remote add origin https://ghfast.top/https://github.com/${{ github.repository }}.git
           else
             cd "$TARGET_DIR"
-            echo "🔄 Updating Git remote URL with current run GITHUB_TOKEN..."
-            git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+            echo "🔄 Updating Git remote URL with Proxy URL..."
+            git remote set-url origin https://ghfast.top/https://github.com/${{ github.repository }}.git
           fi
           
           # 2. DISCARD UNTRACKED FILES OR LOCAL ACCIDENTAL EDITS & FETCH LATEST COMMIT
