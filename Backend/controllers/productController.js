@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -170,34 +171,120 @@ export const updateHomepageSections = async (req, res) => {
   }
 };
 
-// Utility endpoint to update all product image URLs to full backend URLs
+// Utility endpoint to update all product and category image/video URLs to secure HTTPS URLs
 export const fixProductImageUrls = async (req, res) => {
   try {
-    const backendUrl = req.protocol + '://' + req.get('host');
+    const backendUrl = 'https://thespritualtrends.com';
     const products = await Product.find();
-    let updatedCount = 0;
+    let updatedProductsCount = 0;
+    
     for (const product of products) {
       let changed = false;
+      
       // Fix main image
-      if (product.image && product.image.startsWith('/uploads/')) {
-        product.image = backendUrl + product.image;
-        changed = true;
-      }
-      // Fix images array
-      if (Array.isArray(product.images)) {
-        for (let img of product.images) {
-          if (img.url && img.url.startsWith('/uploads/')) {
-            img.url = backendUrl + img.url;
+      if (product.image) {
+        if (product.image.startsWith('/uploads/')) {
+          product.image = backendUrl + product.image;
+          changed = true;
+        } else if (product.image.startsWith('http://') || product.image.includes('localhost:5000') || product.image.includes('127.0.0.1:5000') || product.image.includes('atharvamishra.online')) {
+          const parts = product.image.split('/uploads/');
+          if (parts.length > 1) {
+            product.image = backendUrl + '/uploads/' + parts[1];
             changed = true;
           }
         }
       }
+      
+      // Fix images array
+      if (Array.isArray(product.images)) {
+        for (let img of product.images) {
+          if (img.url) {
+            if (img.url.startsWith('/uploads/')) {
+              img.url = backendUrl + img.url;
+              changed = true;
+            } else if (img.url.startsWith('http://') || img.url.includes('localhost:5000') || img.url.includes('127.0.0.1:5000') || img.url.includes('atharvamishra.online')) {
+              const parts = img.url.split('/uploads/');
+              if (parts.length > 1) {
+                img.url = backendUrl + '/uploads/' + parts[1];
+                changed = true;
+              }
+            }
+          }
+        }
+      }
+      
       if (changed) {
         await product.save();
-        updatedCount++;
+        updatedProductsCount++;
       }
     }
-    res.json({ message: `Updated ${updatedCount} products with full image URLs.` });
+
+    // Fix Categories
+    const categories = await Category.find();
+    let updatedCategoriesCount = 0;
+    
+    for (const category of categories) {
+      let changed = false;
+      
+      // Fix category image
+      if (category.image) {
+        if (category.image.startsWith('/uploads/')) {
+          category.image = backendUrl + category.image;
+          changed = true;
+        } else if (category.image.startsWith('http://') || category.image.includes('localhost:5000') || category.image.includes('127.0.0.1:5000') || category.image.includes('atharvamishra.online')) {
+          const parts = category.image.split('/uploads/');
+          if (parts.length > 1) {
+            category.image = backendUrl + '/uploads/' + parts[1];
+            changed = true;
+          }
+        }
+      }
+
+      // Fix category video
+      if (category.video) {
+        if (category.video.startsWith('/uploads/')) {
+          category.video = backendUrl + category.video;
+          changed = true;
+        } else if (category.video.startsWith('http://') || category.video.includes('localhost:5000') || category.video.includes('127.0.0.1:5000') || category.video.includes('atharvamishra.online')) {
+          const parts = category.video.split('/uploads/');
+          if (parts.length > 1) {
+            category.video = backendUrl + '/uploads/' + parts[1];
+            changed = true;
+          }
+        }
+      }
+
+      // Fix productImages array inside category
+      if (Array.isArray(category.productImages)) {
+        for (let i = 0; i < category.productImages.length; i++) {
+          const imgUrl = category.productImages[i];
+          if (imgUrl) {
+            if (imgUrl.startsWith('/uploads/')) {
+              category.productImages[i] = backendUrl + imgUrl;
+              changed = true;
+            } else if (imgUrl.startsWith('http://') || imgUrl.includes('localhost:5000') || imgUrl.includes('127.0.0.1:5000') || imgUrl.includes('atharvamishra.online')) {
+              const parts = imgUrl.split('/uploads/');
+              if (parts.length > 1) {
+                category.productImages[i] = backendUrl + '/uploads/' + parts[1];
+                changed = true;
+              }
+            }
+          }
+        }
+      }
+
+      if (changed) {
+        category.markModified('productImages');
+        await category.save();
+        updatedCategoriesCount++;
+      }
+    }
+    
+    res.json({ 
+      message: 'Secure HTTPS URLs migration complete.',
+      updatedProducts: updatedProductsCount,
+      updatedCategories: updatedCategoriesCount
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
